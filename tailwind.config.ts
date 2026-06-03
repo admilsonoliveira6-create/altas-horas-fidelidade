@@ -1,5 +1,7 @@
 import type { Config } from 'tailwindcss'
 
+// Importa cores do config do cliente
+// Para trocar as cores: edite src/lib/config.ts
 const config: Config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,8 +12,8 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          red: '#D91F26',
-          gold: '#F5C518',
+          red: 'var(--cor-primaria)',
+          gold: 'var(--cor-secundaria)',
           dark: '#1A1A1A',
         },
       },

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Bebas_Neue, Montserrat } from 'next/font/google'
+import config from '@/lib/config'
 import './globals.css'
 
 const bebasNeue = Bebas_Neue({
@@ -14,18 +15,18 @@ const montserrat = Montserrat({
 })
 
 export const metadata: Metadata = {
-  title: 'Altas Horas Fidelidade',
-  description: 'A qualquer hora, o Altas Horas tem. Acumule pontos e ganhe cerveja grátis!',
+  title: `${config.nome} Fidelidade`,
+  description: `Programa de fidelidade — ${config.nome}. ${config.tagline}`,
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Altas Horas',
+    title: config.nome,
   },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#D91F26',
+  themeColor: config.corPrimaria,
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -37,6 +38,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <style>{`
+          :root {
+            --cor-primaria: ${config.corPrimaria};
+            --cor-secundaria: ${config.corSecundaria};
+            --cor-texto: ${config.corTexto};
+          }
+        `}</style>
       </head>
       <body className="font-body bg-brand-dark min-h-screen">
         {children}

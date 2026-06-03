@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import config from './config'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder'
@@ -21,19 +22,5 @@ export type Transaction = {
   created_at: string
 }
 
-export const REWARDS = [
-  {
-    id: 'cerveja',
-    name: 'Cerveja Grátis',
-    description: '1 long neck gelada na hora',
-    points: 200,
-    emoji: '🍺',
-  },
-  {
-    id: 'fardo',
-    name: 'Fardo Grátis',
-    description: 'Fardo 12 latas da sua escolha',
-    points: 500,
-    emoji: '📦',
-  },
-]
+// Prêmios vêm do config — não precisa editar aqui
+export const REWARDS = config.premios
