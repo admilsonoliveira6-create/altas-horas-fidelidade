@@ -2,10 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import dynamic from 'next/dynamic'
 import { supabase, Customer, Transaction, REWARDS } from '@/lib/supabase'
-
-const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => m.QRCodeSVG), { ssr: false })
 
 export default function Dashboard() {
   const router = useRouter()
@@ -57,6 +54,8 @@ export default function Dashboard() {
     100
   )
 
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${customer.phone}&bgcolor=ffffff&color=1A1A1A&margin=10`
+
   return (
     <main className="min-h-screen bg-brand-dark font-body">
       {/* Modal QR Code */}
@@ -65,16 +64,20 @@ export default function Dashboard() {
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center px-6"
           onClick={() => setShowQR(false)}
         >
-          <div className="bg-brand-dark rounded-2xl p-6 text-center w-full max-w-xs" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="bg-brand-dark rounded-2xl p-6 text-center w-full max-w-xs"
+            onClick={(e) => e.stopPropagation()}
+          >
             <p className="text-white/50 text-xs uppercase tracking-widest mb-1">Seu QR Code</p>
             <p className="text-white font-display text-2xl mb-4">{customer.name}</p>
-            <div className="bg-white p-4 rounded-xl inline-block mb-4">
-              <QRCodeSVG
-                value={customer.phone}
-                size={200}
-                bgColor="#FFFFFF"
-                fgColor="#1A1A1A"
-                level="M"
+            <div className="bg-white p-3 rounded-xl inline-block mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qrUrl}
+                alt="QR Code"
+                width={220}
+                height={220}
+                className="block"
               />
             </div>
             <p className="text-white/40 text-xs mb-4">
@@ -99,34 +102,22 @@ export default function Dashboard() {
               {customer.name.split(' ')[0].toUpperCase()}!
             </h1>
           </div>
-          <button
-            onClick={logout}
-            className="text-white/40 text-xs mt-1 hover:text-white/70 transition-colors"
-          >
-            Sair
-          </button>
+          <button onClick={logout} className="text-white/40 text-xs mt-1">Sair</button>
         </div>
 
-        {/* Cartão de pontos */}
         <div className="bg-brand-dark rounded-2xl p-5 shadow-xl">
           <p className="text-white/50 text-xs uppercase tracking-widest mb-1">Seus pontos</p>
           <div className="flex items-end gap-2 mb-4">
-            <span className="font-display text-brand-gold text-6xl leading-none">
-              {customer.points}
-            </span>
+            <span className="font-display text-brand-gold text-6xl leading-none">{customer.points}</span>
             <span className="text-white/40 text-sm mb-2">pts</span>
           </div>
-
           <div className="mb-1">
             <div className="flex justify-between text-xs text-white/40 mb-1">
               <span>{customer.points} pts</span>
               <span>{nextReward.emoji} {nextReward.points} pts</span>
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-brand-gold rounded-full transition-all duration-700"
-                style={{ width: `${progress}%` }}
-              />
+              <div className="h-full bg-brand-gold rounded-full transition-all duration-700" style={{ width: `${progress}%` }} />
             </div>
             <p className="text-white/40 text-xs mt-1">
               {Math.max(nextReward.points - customer.points, 0)} pts para {nextReward.name}
@@ -144,9 +135,7 @@ export default function Dashboard() {
           <span className="text-2xl">📱</span>
           <span className="text-white font-display text-xl tracking-wide">MEU QR CODE</span>
         </button>
-        <p className="text-white/30 text-xs text-center mt-2">
-          Mostra pro atendente na hora da compra
-        </p>
+        <p className="text-white/30 text-xs text-center mt-2">Mostra pro atendente na hora da compra</p>
       </div>
 
       {/* Prêmios */}
@@ -156,32 +145,20 @@ export default function Dashboard() {
           {REWARDS.map((reward) => {
             const unlocked = customer.points >= reward.points
             return (
-              <div
-                key={reward.id}
-                className={`flex items-center gap-4 rounded-xl p-4 border transition-all ${
-                  unlocked
-                    ? 'bg-brand-gold/10 border-brand-gold'
-                    : 'bg-white/5 border-white/10'
-                }`}
-              >
+              <div key={reward.id} className={`flex items-center gap-4 rounded-xl p-4 border transition-all ${unlocked ? 'bg-brand-gold/10 border-brand-gold' : 'bg-white/5 border-white/10'}`}>
                 <span className="text-3xl">{reward.emoji}</span>
                 <div className="flex-1">
-                  <p className={`font-display text-xl ${unlocked ? 'text-brand-gold' : 'text-white/50'}`}>
-                    {reward.name}
-                  </p>
+                  <p className={`font-display text-xl ${unlocked ? 'text-brand-gold' : 'text-white/50'}`}>{reward.name}</p>
                   <p className="text-white/40 text-xs">{reward.description}</p>
                 </div>
                 <div className="text-right">
-                  <p className={`font-display text-xl ${unlocked ? 'text-brand-gold' : 'text-white/30'}`}>
-                    {reward.points}
-                  </p>
+                  <p className={`font-display text-xl ${unlocked ? 'text-brand-gold' : 'text-white/30'}`}>{reward.points}</p>
                   <p className="text-white/30 text-xs">pts</p>
                 </div>
               </div>
             )
           })}
         </div>
-
         {customer.points >= 200 && (
           <button
             onClick={() => router.push('/resgatar')}
@@ -202,13 +179,7 @@ export default function Dashboard() {
                 <div>
                   <p className="text-white text-sm">{tx.description}</p>
                   <p className="text-white/30 text-xs">
-                    {new Date(tx.created_at).toLocaleDateString('pt-BR', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {new Date(tx.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
                 <span className={`font-display text-xl ${tx.points > 0 ? 'text-brand-gold' : 'text-red-400'}`}>
