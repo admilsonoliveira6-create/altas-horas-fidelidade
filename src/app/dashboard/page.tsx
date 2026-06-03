@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { QRCodeSVG } from 'qrcode.react'
+import dynamic from 'next/dynamic'
 import { supabase, Customer, Transaction, REWARDS } from '@/lib/supabase'
+
+const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => m.QRCodeSVG), { ssr: false })
 
 export default function Dashboard() {
   const router = useRouter()
