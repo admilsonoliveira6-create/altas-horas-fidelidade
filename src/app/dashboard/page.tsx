@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { QRCodeSVG } from 'qrcode.react'
 import { supabase, Customer, Transaction, REWARDS } from '@/lib/supabase'
 
 export default function Dashboard() {
@@ -9,6 +10,7 @@ export default function Dashboard() {
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
+  const [showQR, setShowQR] = useState(false)
 
   const loadData = useCallback(async (id: string) => {
     const [{ data: cust }, { data: txns }] = await Promise.all([
@@ -55,6 +57,37 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen bg-brand-dark font-body">
+      {/* Modal QR Code */}
+      {showQR && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center px-6"
+          onClick={() => setShowQR(false)}
+        >
+          <div className="bg-brand-dark rounded-2xl p-6 text-center w-full max-w-xs" onClick={(e) => e.stopPropagation()}>
+            <p className="text-white/50 text-xs uppercase tracking-widest mb-1">Seu QR Code</p>
+            <p className="text-white font-display text-2xl mb-4">{customer.name}</p>
+            <div className="bg-white p-4 rounded-xl inline-block mb-4">
+              <QRCodeSVG
+                value={customer.phone}
+                size={200}
+                bgColor="#FFFFFF"
+                fgColor="#1A1A1A"
+                level="M"
+              />
+            </div>
+            <p className="text-white/40 text-xs mb-4">
+              Mostra pro atendente escanear
+            </p>
+            <button
+              onClick={() => setShowQR(false)}
+              className="w-full bg-brand-gold text-brand-dark font-display text-xl py-3 rounded-xl tracking-wider"
+            >
+              FECHAR
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-brand-red px-5 pt-10 pb-6">
         <div className="flex items-start justify-between mb-6">
@@ -82,7 +115,6 @@ export default function Dashboard() {
             <span className="text-white/40 text-sm mb-2">pts</span>
           </div>
 
-          {/* Barra de progresso */}
           <div className="mb-1">
             <div className="flex justify-between text-xs text-white/40 mb-1">
               <span>{customer.points} pts</span>
@@ -99,6 +131,20 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Botão QR Code */}
+      <div className="px-5 pt-5">
+        <button
+          onClick={() => setShowQR(true)}
+          className="w-full flex items-center justify-center gap-3 bg-white/10 border border-white/20 rounded-xl py-3 hover:border-brand-gold transition-colors"
+        >
+          <span className="text-2xl">📱</span>
+          <span className="text-white font-display text-xl tracking-wide">MEU QR CODE</span>
+        </button>
+        <p className="text-white/30 text-xs text-center mt-2">
+          Mostra pro atendente na hora da compra
+        </p>
       </div>
 
       {/* Prêmios */}
@@ -129,10 +175,6 @@ export default function Dashboard() {
                   </p>
                   <p className="text-white/30 text-xs">pts</p>
                 </div>
-                {unlocked && (
-                  <div className="absolute right-4">
-                  </div>
-                )}
               </div>
             )
           })}
@@ -167,11 +209,7 @@ export default function Dashboard() {
                     })}
                   </p>
                 </div>
-                <span
-                  className={`font-display text-xl ${
-                    tx.points > 0 ? 'text-brand-gold' : 'text-red-400'
-                  }`}
-                >
+                <span className={`font-display text-xl ${tx.points > 0 ? 'text-brand-gold' : 'text-red-400'}`}>
                   {tx.points > 0 ? '+' : ''}{tx.points}
                 </span>
               </div>
